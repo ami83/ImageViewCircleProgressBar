@@ -1,0 +1,70 @@
+/06/2017.
+ *
+ * clips View by degrees.
+ * for circular progress bars.
+ * (background will not be clipped. can be used for effect..)
+ */
+
+public class ImageViewCircleProgressBar extends android.support.v7.widget.AppCompatImageView {
+
+
+    private Path mClippingPath = new Path();
+    private float startAngle = 270;
+    private boolean clockWise = true;
+
+
+    public MyClipCircleView(Context context) {
+        super(context);
+    }
+
+    public MyClipCircleView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MyClipCircleView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+
+    /**
+     * updates image. will clip the image only showing from startAngle till angle
+     * @param angle from startAngle
+     */
+    public void setAngleToDraw(float angle) {
+
+        //Convert the progress in range of 0 to 100 to angle in range of 0 180. Easy math.
+        angle = angle % 360;
+        mClippingPath.reset();
+        //Define a rectangle containing the image
+        RectF oval = new RectF(0, 0, this.getWidth(), this.getHeight());
+        //Move the current position to center of rect
+        mClippingPath.moveTo(oval.centerX(), oval.centerY());
+        //Draw an arc from center to given angle
+        if (clockWise)
+        mClippingPath.addArc(oval, startAngle, angle);
+        else         mClippingPath.addArc(oval, startAngle - angle, angle);
+
+        //Draw a line from end of arc to center
+        mClippingPath.lineTo(oval.centerX(), oval.centerY());
+        //Redraw the canvas
+        invalidate();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        //Clip the canvas
+        canvas.clipPath(mClippingPath);
+        super.onDraw(canvas);
+    }
+
+    /**
+     * 
+     * @param startAngle  3 o'clock is 0.
+     */
+    public void setStartAngle(float startAngle) {
+        this.startAngle = startAngle % 360;
+    }
+    public void setClockWise(boolean clockWise){
+        this.clockWise = clockWise;
+    }
+}
